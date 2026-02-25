@@ -144,6 +144,36 @@ tr:hover {
     background-color: #e9ecef;
 }
 
+/* Unit subheader styling */
+.unit-subheader {
+    font-weight: 600;
+    border-top: 3px solid #1a2a6c;
+    border-bottom: 2px solid #1a2a6c;
+}
+
+.unit-subheader td {
+    padding: 14px 15px;
+}
+
+/* Unit background colors */
+.unit-bg-light {
+    background-color: #fafbff;
+}
+
+.unit-bg-dark {
+    background-color: #f0f3ff;
+}
+
+.unit-subheader.unit-bg-light {
+    background: linear-gradient(to right, #e8ecff, #fafbff);
+    color: #1a2a6c;
+}
+
+.unit-subheader.unit-bg-dark {
+    background: linear-gradient(to right, #d4dcff, #f0f3ff);
+    color: #1a2a6c;
+}
+
 /* Semester Card */
 .semester-card {
     background: linear-gradient(135deg, #3a4ca8, #1a2a6c);
@@ -227,6 +257,23 @@ tr:hover {
 
 .instructions li {
     margin-bottom: 8px;
+}
+
+/* Uncertain grade badge */
+.uncertain-badge {
+    display: inline-block;
+    background-color: #fff3cd;
+    color: #856404;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    margin-left: 6px;
+    font-weight: 600;
+    border: 1px solid #ffc107;
+}
+
+.uncertain-badge i {
+    margin-right: 3px;
 }
 
 /* Footer */

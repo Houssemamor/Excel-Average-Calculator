@@ -37,17 +37,37 @@ function getGradeClass(grade) {
 
 // Compute subject average based on exam and coursework components
 // Weighting: Exam 60%, Project and Devoir combined 40%
+// If Exam is missing, calculate from available components with equal weight
 function compute_avg(exam, devoir, projet, tp) {
-    if (!isNaN(projet) && !isNaN(devoir)) {
-        return exam * 0.6 + projet * 0.2 + devoir * 0.2;
-    } else if (!isNaN(projet)) {
-        return exam * 0.6 + projet * 0.4;
-    } else if (!isNaN(devoir)) {
-        return exam * 0.6 + devoir * 0.4;
-    } else if (!isNaN(tp)) {
-        return exam * 0.6 + tp * 0.4;
+    const hasExam = !isNaN(exam);
+    const hasDevoir = !isNaN(devoir);
+    const hasProjet = !isNaN(projet);
+    const hasTp = !isNaN(tp);
+    
+    // If exam exists, use standard weighting (60% exam, 40% coursework)
+    if (hasExam) {
+        if (hasProjet && hasDevoir) {
+            return exam * 0.6 + projet * 0.2 + devoir * 0.2;
+        } else if (hasProjet) {
+            return exam * 0.6 + projet * 0.4;
+        } else if (hasDevoir) {
+            return exam * 0.6 + devoir * 0.4;
+        } else if (hasTp) {
+            return exam * 0.6 + tp * 0.4;
+        }
+        return exam;
     }
-    return exam;
+    
+    // If exam is missing, calculate from available components with equal weighting
+    const availableComponents = [];
+    if (hasDevoir) availableComponents.push(devoir);
+    if (hasProjet) availableComponents.push(projet);
+    if (hasTp) availableComponents.push(tp);
+    
+    if (availableComponents.length === 0) return NaN;
+    
+    // Return average of available components
+    return availableComponents.reduce((a, b) => a + b, 0) / availableComponents.length;
 }
 
 // Extract semester number from unit string
@@ -120,14 +140,25 @@ function processFileData(data, outputDiv) {
             const exam = normalizeGrade(sanitizeNumber(row[6]), gradeScale);   // Column G: EXAMEN
             const tp = normalizeGrade(sanitizeNumber(row[7]), gradeScale);     // Column H: TRAVAUX PRATIQUES
 
-            // Skip rows with invalid exam grade or coefficient
-            if (isNaN(exam) || isNaN(coef)) continue;
+            // Skip rows with invalid coefficient or no grades at all
+            if (isNaN(coef)) {
+                console.warn(`Skipping row ${i + 1}: Unit="${unit}", Name="${name}" - Invalid coefficient`);
+                continue;
+            }
+            
+            // Check if at least one grade component exists
+            const hasAnyGrade = !isNaN(exam) || !isNaN(devoir) || !isNaN(projet) || !isNaN(tp);
+            if (!hasAnyGrade) {
+                console.warn(`Skipping row ${i + 1}: Unit="${unit}", Name="${name}" - No grade components`);
+                continue;
+            }
 
             const avg = compute_avg(exam, devoir, projet, tp);
             const weighted = avg * coef;
             const semester = extractSemester(unit);
+            const hasExamGrade = !isNaN(exam); // Track if exam grade exists
 
-            result.push({ unit, name, exam, devoir, projet, tp, coef, avg, weighted, semester });
+            result.push({ unit, name, exam, devoir, projet, tp, coef, avg, weighted, semester, hasExamGrade });
 
             // Accumulate unit statistics
             if (!unitData.has(unit)) {
@@ -157,21 +188,46 @@ function processFileData(data, outputDiv) {
         let totalWeighted = 0;
         let totalCoef = 0;
 
-        // Output subject results table
+        // Group results by unit for visual division
+        const unitGroups = new Map();
         result.forEach(row => {
-            html += `<tr>
+            if (!unitGroups.has(row.unit)) {
+                unitGroups.set(row.unit, []);
+            }
+            unitGroups.get(row.unit).push(row);
+        });
+
+        // Output subject results table with unit dividers
+        let unitIndex = 0;
+        unitGroups.forEach((rows, unit) => {
+            // Add unit subheader
+            const unitBgClass = unitIndex % 2 === 0 ? 'unit-bg-light' : 'unit-bg-dark';
+            html += `<tr class="unit-subheader ${unitBgClass}">
+          <td colspan="8"><strong><i class="fas fa-folder-open"></i> ${unit}</strong></td>
+        </tr>`;
+            
+            // Add subject rows for this unit
+            rows.forEach(row => {
+                const avgDisplay = row.hasExamGrade ? 
+                    row.avg.toFixed(2) : 
+                    `${row.avg.toFixed(2)} <span class="uncertain-badge"><i class="fas fa-exclamation-circle"></i> Uncertain</span>`;
+                
+                html += `<tr class="${unitBgClass}">
           <td>${row.name}</td>
           <td class="subject-grade ${getGradeClass(row.exam)}">${displayGrade(row.exam)}</td>
           <td class="subject-grade ${getGradeClass(row.devoir)}">${displayGrade(row.devoir)}</td>
           <td class="subject-grade ${getGradeClass(row.projet)}">${displayGrade(row.projet)}</td>
           <td class="subject-grade ${getGradeClass(row.tp)}">${displayGrade(row.tp)}</td>
           <td>${Math.round(row.coef/100)}</td>
-          <td class="subject-grade ${getGradeClass(row.avg)}">${row.avg.toFixed(2)}</td>
-          <td>${row.weighted.toFixed(2)}</td>
+          <td class="subject-grade ${getGradeClass(row.avg)}">${avgDisplay}</td>
+          <td>${row.weighted.toFixed(2)/100}</td>
         </tr>`;
 
-            totalWeighted += row.weighted;
-            totalCoef += row.coef;
+                totalWeighted += row.weighted;
+                totalCoef += row.coef;
+            });
+            
+            unitIndex++;
         });
 
         html += '</table>';
@@ -186,7 +242,7 @@ function processFileData(data, outputDiv) {
           <td>${unit}</td>
           <td>${data.semester}</td>
           <td class="unit-grade ${getGradeClass(unitAvg)}">${unitAvg.toFixed(2)}</td>
-          <td>${Math.round(data.totalCoef)}</td>
+          <td>${Math.round(data.totalCoef/100)}</td>
         </tr>`;
         });
         html += '</table>';
@@ -201,7 +257,7 @@ function processFileData(data, outputDiv) {
             <tr><th>Total Weighted</th><th>Total Coefficient</th><th>Semester Average</th></tr>
             <tr>
               <td>${data.totalWeighted.toFixed(2)}</td>
-              <td>${data.totalCoef}</td>
+              <td>${Math.round(data.totalCoef/100)}</td>
               <td class="unit-grade ${getGradeClass(semesterAvg)}">${semesterAvg.toFixed(2)}</td>
             </tr>
           </table>
@@ -213,7 +269,7 @@ function processFileData(data, outputDiv) {
         html += `<div class="overall-average">
         <h3>Overall Average</h3>
         <div class="average-value ${getGradeClass(generalAvg)}">${generalAvg.toFixed(2)}</div>
-        <p>Based on ${result.length} subjects | Total Coefficient: ${Math.round(totalCoef)}</p>
+        <p>Based on ${result.length} subjects | Total Coefficient: ${Math.round(totalCoef/100)}</p>
       </div>`;
 
         // Store scale info in the output for reference
