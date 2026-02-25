@@ -12,11 +12,27 @@ function displayGrade(grade) {
     return isNaN(grade) ? '-' : grade.toFixed(2);
 }
 
-// Determine CSS class for grade color coding
+// Detect if grades are on 0-2000 scale by checking if any value exceeds 20
+function detectGradeScale(gradesArray) {
+    for (const grade of gradesArray) {
+        if (!isNaN(grade) && grade > 20) {
+            return 2000; // 0-2000 scale
+        }
+    }
+    return 20; // 0-20 scale
+}
+
+// Convert grade from 0-2000 scale to 0-20 scale
+function normalizeGrade(grade, scale) {
+    if (isNaN(grade)) return NaN;
+    return scale === 2000 ? grade / 100 : grade;
+}
+
+// Determine CSS class for grade color coding (using 0-20 scale)
 function getGradeClass(grade) {
-    if (grade >= 1500) return "grade-good";
-    if (grade >= 1000) return "grade-average";
-    return "grade-poor";
+    if (grade >= 15) return "grade-good";     // 75% and above
+    if (grade >= 10) return "grade-average";  // 50-74%
+    return "grade-poor";                       // Below 50%
 }
 
 // Compute subject average based on exam and coursework components
@@ -72,8 +88,25 @@ function processFileData(data, outputDiv) {
         const result = [];
         const unitData = new Map();
         const semesterData = new Map();
+        const allGrades = []; // Collect all grades to detect scale
 
-        // Process each row starting from index 2 (header is at 0-1)
+        // First pass: collect all grades to detect scale
+        for (let i = 2; i < sheet.length; i++) {
+            const row = sheet[i];
+            if (!row || row.length < 10) continue;
+
+            allGrades.push(
+                sanitizeNumber(row[4]), // DEVOIR
+                sanitizeNumber(row[5]), // EXAMEN
+                sanitizeNumber(row[6]), // PROJET
+                sanitizeNumber(row[7])  // TP
+            );
+        }
+
+        // Detect the grade scale (0-20 or 0-2000)
+        const gradeScale = detectGradeScale(allGrades);
+
+        // Second pass: process rows with normalized grades
         for (let i = 2; i < sheet.length; i++) {
             const row = sheet[i];
             if (!row || row.length < 10) continue;
@@ -82,10 +115,10 @@ function processFileData(data, outputDiv) {
             const unit = row[0] || '-';          // Column A: Unit
             const name = row[2] || '-';          // Column C: Subject name
             const coef = sanitizeNumber(row[3]); // Column D: Coefficient
-            const devoir = sanitizeNumber(row[4]); // Column E: DEVOIR
-            const exam = sanitizeNumber(row[5]); // Column F: EXAMEN
-            const projet = sanitizeNumber(row[6]); // Column G: PROJET
-            const tp = sanitizeNumber(row[7]);   // Column H: TRAVAUX PRATIQUES
+            const devoir = normalizeGrade(sanitizeNumber(row[4]), gradeScale); // Column E: DEVOIR
+            const exam = normalizeGrade(sanitizeNumber(row[5]), gradeScale);   // Column F: EXAMEN
+            const projet = normalizeGrade(sanitizeNumber(row[6]), gradeScale); // Column G: PROJET
+            const tp = normalizeGrade(sanitizeNumber(row[7]), gradeScale);     // Column H: TP
 
             // Skip rows with invalid exam grade or coefficient
             if (isNaN(exam) || isNaN(coef)) continue;
@@ -117,6 +150,7 @@ function processFileData(data, outputDiv) {
 
         // Generate output HTML
         let html = '<h2><i class="fas fa-book"></i> Subject Results</h2>';
+        html += `<p style="color: #666; font-size: 0.9rem; margin-bottom: 15px;">Grade Scale: 0-20 | File detected: ${gradeScale === 2000 ? '0-2000 (converted)' : '0-20'}</p>`;
         html += '<table>';
         html += '<tr><th>Subject</th><th>EXAMEN</th><th>DEVOIR</th><th>PROJET</th><th>TP</th><th>Coef.</th><th>Average</th><th>Weighted</th></tr>';
 
@@ -182,6 +216,8 @@ function processFileData(data, outputDiv) {
         <p>Based on ${result.length} subjects | Total Coefficient: ${totalCoef}</p>
       </div>`;
 
+        // Store scale info in the output for reference
+        outputDiv.dataset.gradeScale = gradeScale;
         outputDiv.innerHTML = html;
     } catch (error) {
         outputDiv.innerHTML = `<div class="error">
