@@ -165,7 +165,7 @@ function processFileData(data, outputDiv) {
           <td class="subject-grade ${getGradeClass(row.devoir)}">${displayGrade(row.devoir)}</td>
           <td class="subject-grade ${getGradeClass(row.projet)}">${displayGrade(row.projet)}</td>
           <td class="subject-grade ${getGradeClass(row.tp)}">${displayGrade(row.tp)}</td>
-          <td>${row.coef}</td>
+          <td>${Math.round(row.coef/100)}</td>
           <td class="subject-grade ${getGradeClass(row.avg)}">${row.avg.toFixed(2)}</td>
           <td>${row.weighted.toFixed(2)}</td>
         </tr>`;
@@ -186,7 +186,7 @@ function processFileData(data, outputDiv) {
           <td>${unit}</td>
           <td>${data.semester}</td>
           <td class="unit-grade ${getGradeClass(unitAvg)}">${unitAvg.toFixed(2)}</td>
-          <td>${data.totalCoef}</td>
+          <td>${Math.round(data.totalCoef)}</td>
         </tr>`;
         });
         html += '</table>';
@@ -213,12 +213,17 @@ function processFileData(data, outputDiv) {
         html += `<div class="overall-average">
         <h3>Overall Average</h3>
         <div class="average-value ${getGradeClass(generalAvg)}">${generalAvg.toFixed(2)}</div>
-        <p>Based on ${result.length} subjects | Total Coefficient: ${totalCoef}</p>
+        <p>Based on ${result.length} subjects | Total Coefficient: ${Math.round(totalCoef)}</p>
       </div>`;
 
         // Store scale info in the output for reference
         outputDiv.dataset.gradeScale = gradeScale;
         outputDiv.innerHTML = html;
+
+        // Hide upload section and scroll to results
+        document.querySelector('.upload-container').style.display = 'none';
+        document.querySelector('.instructions').style.display = 'none';
+        outputDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
     } catch (error) {
         outputDiv.innerHTML = `<div class="error">
         <i class="fas fa-exclamation-triangle fa-3x"></i>
