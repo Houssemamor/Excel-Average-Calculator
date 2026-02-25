@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Calculate subject, unit, and semester averages from Excel files">
+    <title>Excel Average Calculator</title>
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+
+    <!-- External Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-calculator"></i> Excel Average Calculator</h1>
+            <p>Calculate subject, unit, and semester averages from Excel files</p>
+        </header>
+
+        <div class="upload-container">
+            <i class="fas fa-file-excel"></i>
+            <p>Drag and drop your Excel file or click to upload</p>
+            <input type="file" id="upload" accept=".xlsx, .xls">
+            <label for="upload" class="upload-btn">
+                <i class="fas fa-upload"></i> Choose Excel File
+            </label>
+        </div>
+
+        <div class="instructions">
+            <h4><i class="fas fa-info-circle"></i> How it works:</h4>
+            <ul>
+                <li>Drag and drop an Excel file, or click to browse and upload</li>
+                <li>The calculator will process subjects and group them by unit and semester</li>
+                <li>Subject averages are calculated using the formula:
+                    <strong>Exam × 60% + (Devoir/Projet/TP) × 40%</strong>
+                </li>
+                <li>Unit and semester averages are weighted by coefficients</li>
+                <li>Final overall average is calculated at the end</li>
+            </ul>
+        </div>
+
+        <div id="output"></div>
+    </div>
+
+    <footer>
+        <p>Excel Average Calculator | Education Tool | © 2026</p>
+    </footer>
+
+    <!-- Custom JavaScript -->
+    <script src="js/script.js"></script>
+</body>
+
+</html>
