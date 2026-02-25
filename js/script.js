@@ -97,9 +97,9 @@ function processFileData(data, outputDiv) {
 
             allGrades.push(
                 sanitizeNumber(row[4]), // DEVOIR
-                sanitizeNumber(row[5]), // EXAMEN
-                sanitizeNumber(row[6]), // PROJET
-                sanitizeNumber(row[7])  // TP
+                sanitizeNumber(row[5]), // PROJET
+                sanitizeNumber(row[6]), // EXAMEN
+                sanitizeNumber(row[7])  // TRAVAUX PRATIQUES
             );
         }
 
@@ -116,9 +116,9 @@ function processFileData(data, outputDiv) {
             const name = row[2] || '-';          // Column C: Subject name
             const coef = sanitizeNumber(row[3]); // Column D: Coefficient
             const devoir = normalizeGrade(sanitizeNumber(row[4]), gradeScale); // Column E: DEVOIR
-            const exam = normalizeGrade(sanitizeNumber(row[5]), gradeScale);   // Column F: EXAMEN
-            const projet = normalizeGrade(sanitizeNumber(row[6]), gradeScale); // Column G: PROJET
-            const tp = normalizeGrade(sanitizeNumber(row[7]), gradeScale);     // Column H: TP
+            const projet = normalizeGrade(sanitizeNumber(row[5]), gradeScale); // Column F: PROJET
+            const exam = normalizeGrade(sanitizeNumber(row[6]), gradeScale);   // Column G: EXAMEN
+            const tp = normalizeGrade(sanitizeNumber(row[7]), gradeScale);     // Column H: TRAVAUX PRATIQUES
 
             // Skip rows with invalid exam grade or coefficient
             if (isNaN(exam) || isNaN(coef)) continue;
