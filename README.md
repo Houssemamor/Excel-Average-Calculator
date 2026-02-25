@@ -2,6 +2,10 @@
 
 A web-based application to calculate subject, unit, and semester averages from Excel files.
 
+## Live Demo
+
+Try it now: [https://houssemamor.github.io/Excel-Average-Calculator/](https://houssemamor.github.io/Excel-Average-Calculator/)
+
 ## Features
 
 - Upload Excel files with grade data
