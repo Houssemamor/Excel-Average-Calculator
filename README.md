@@ -39,10 +39,17 @@ Excel-Average-Calculator/
 
 ## How to Use
 
+### Online (No Installation Required)
+Simply visit the live site: [https://houssemamor.github.io/Excel-Average-Calculator/](https://houssemamor.github.io/Excel-Average-Calculator/)
+
+### Local Setup
 1. Clone or download this repository
 2. Open `index.html` in a web browser
-3. Click "Choose Excel File" to upload your grades file
-4. The application will process and display:
+3. Upload your Excel file and view results
+
+### Usage Steps
+1. Click "Choose Excel File" or drag and drop your grades file
+2. The application will process and display:
    - Subject results with individual grades
    - Unit averages grouped by unit
    - Semester averages
@@ -62,24 +69,11 @@ The Excel file should contain the following columns:
 
 Data should start from row 3 (rows 1-2 are headers).
 
-## Deploying to GitHub Pages
+## Deployment
 
-1. Create a new repository on GitHub
-2. Initialize git in your project folder:
-   ```bash
-   git init
-   git add .
-   git commit -m "Initial commit"
-   git branch -M main
-   git remote add origin https://github.com/your-username/Excel-Average-Calculator.git
-   git push -u origin main
-   ```
+This project is already deployed on GitHub Pages at: [https://houssemamor.github.io/Excel-Average-Calculator/](https://houssemamor.github.io/Excel-Average-Calculator/)
 
-3. Go to your repository settings
-4. Navigate to "Pages" section
-5. Select "Deploy from a branch"
-6. Choose "main" branch and root folder
-7. Save - your site will be live at: `https://your-username.github.io/Excel-Average-Calculator`
+Changes pushed to the `main` branch are automatically deployed.
 
 ## Technologies Used
 
