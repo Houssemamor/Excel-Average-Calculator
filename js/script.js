@@ -248,7 +248,7 @@ function processFileData(data, outputDiv) {
         let html = '<h2><i class="fas fa-book"></i> Subject Results</h2>';
         //html += `<p style="color: #666; font-size: 0.9rem; margin-bottom: 15px;">Grade Scale: 0-20 | File detected: ${gradeScale === 2000 ? '0-2000 (converted)' : '0-20'}</p>`;
         html += '<table>';
-        html += '<tr><th>Subject</th><th>DEVOIR</th><th>TP</th><th>PROJET</th><th>EXAMEN</th><th>Coef.</th><th>Average</th><th>Weighted</th></tr>';
+        html += '<tr><th>Subject</th><th>DEVOIR</th><th>TP</th><th>PROJET</th><th>EXAMEN</th><th>Average</th><th>Coef.</th><th>Weighted</th></tr>';
 
         let totalWeighted = 0;
         let totalCoef = 0;
@@ -283,8 +283,8 @@ function processFileData(data, outputDiv) {
           <td class="subject-grade ${getGradeClass(row.tp)}">${displayGrade(row.tp)}</td>
           <td class="subject-grade ${getGradeClass(row.projet)}">${displayGrade(row.projet)}</td>
           <td class="subject-grade ${getGradeClass(row.exam)}">${displayGrade(row.exam)}</td>
-          <td>${Math.round(row.coef/100)}</td>
           <td class="subject-grade ${getGradeClass(row.avg)}">${avgDisplay}</td>
+          <td>${Math.round(row.coef/100)}</td>
           <td>${row.weighted.toFixed(2)/100}</td>
         </tr>`;
 
