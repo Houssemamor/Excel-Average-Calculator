@@ -72,8 +72,15 @@ function compute_avg(exam, devoir, projet, tp) {
 
 // Extract semester number from unit string
 function extractSemester(unit) {
-    const match = unit.match(/semestre\s*(\d+)/i);
+    // Handle both formats: "Name/Semestre 1" and "Name - Semestre 1"
+    const match = unit.match(/[\/\-]?\s*[Ss]emestre\s*(\d+)/i);
     return match ? `Semester ${match[1]}` : "Other";
+}
+
+// Clean unit name by removing semester suffix
+function cleanUnitName(unit) {
+    // Remove everything after and including "/" or "-" followed by "Semestre"
+    return unit.replace(/\s*[\/\-]?\s*[Ss]emestre\s*\d+.*$/i, '').trim();
 }
 
 // Auto-detect column indices from headers
@@ -93,9 +100,12 @@ function detectColumnIndices(headerRow) {
     for (let i = 0; i < headerRow.length; i++) {
         const header = String(headerRow[i] || '').toLowerCase().trim();
 
-        if (header.includes('unité') && !header.includes('unité/')) indices.unit = i;
-        if (header.includes('coef') && header.includes('unité')) indices.unitCoef = i;
-        if (header.includes('unité/matière') || header.includes('subject') || (header.includes('matière') && !header.includes('coef'))) indices.subject = i;
+        // More specific matching for unit - must start with "unité" and not include "coef" or "/"
+        if (header === 'unité' || (header.startsWith('unité') && !header.includes('coef') && !header.includes('/'))) {
+            indices.unit = i;
+        }
+        if (header.includes('coef') && header.includes('unité') && !header.includes('matière')) indices.unitCoef = i;
+        if (header.includes('unité/matière') || header.includes('subject') || header.includes('matière')) indices.subject = i;
         if (header.includes('coef') && !header.includes('unité')) indices.coef = i;
         if (header.includes('devoir')) indices.devoir = i;
         if (header.includes('projet')) indices.projet = i;
@@ -175,9 +185,20 @@ function processFileData(data, outputDiv) {
             if (!row || row.length < 4) continue;
 
             // Column mappings using auto-detected indices
-            const unit = row[colIndices.unit] || '-';
+            let unit = row[colIndices.unit] || '-';
             const name = row[colIndices.subject] || '-';
             const coef = sanitizeNumber(row[colIndices.coef]);
+            
+            // Skip header rows or rows with header keywords
+            if (typeof unit === 'string' && (
+                unit.toLowerCase() === 'unité' || 
+                unit.toLowerCase().includes('devoir') ||
+                unit.toLowerCase().includes('examen')
+            )) {
+                console.warn(`Skipping header row at ${i + 1}`);
+                continue;
+            }
+            
             const devoir = normalizeGrade(sanitizeNumber(row[colIndices.devoir]), gradeScale);
             const projet = normalizeGrade(sanitizeNumber(row[colIndices.projet]), gradeScale);
             const exam = normalizeGrade(sanitizeNumber(row[colIndices.exam]), gradeScale);
@@ -185,30 +206,31 @@ function processFileData(data, outputDiv) {
 
             // Skip rows with invalid coefficient or no grades at all
             if (isNaN(coef)) {
-                console.warn(`Skipping row ${i + 1}: Unit="${unit}", Name="${name}" - Invalid coefficient`);
+                console.warn(`Skipping row ${i + 1}: Unit="${cleanUnitName(unit)}", Name="${name}" - Invalid coefficient`);
                 continue;
             }
             
             // Check if at least one grade component exists
             const hasAnyGrade = !isNaN(exam) || !isNaN(devoir) || !isNaN(projet) || !isNaN(tp);
             if (!hasAnyGrade) {
-                console.warn(`Skipping row ${i + 1}: Unit="${unit}", Name="${name}" - No grade components`);
+                console.warn(`Skipping row ${i + 1}: Unit="${cleanUnitName(unit)}", Name="${name}" - No grade components`);
                 continue;
             }
 
             const avg = compute_avg(exam, devoir, projet, tp);
             const weighted = avg * coef;
             const semester = extractSemester(unit);
+            const cleanUnit = cleanUnitName(unit); // Clean unit name for display
             const hasExamGrade = !isNaN(exam); // Track if exam grade exists
 
-            result.push({ unit, name, exam, devoir, projet, tp, coef, avg, weighted, semester, hasExamGrade });
+            result.push({ unit: cleanUnit, name, exam, devoir, projet, tp, coef, avg, weighted, semester, hasExamGrade });
 
             // Accumulate unit statistics
-            if (!unitData.has(unit)) {
-                unitData.set(unit, { totalWeighted: 0, totalCoef: 0, semester });
+            if (!unitData.has(cleanUnit)) {
+                unitData.set(cleanUnit, { totalWeighted: 0, totalCoef: 0, semester });
             }
 
-            const unitInfo = unitData.get(unit);
+            const unitInfo = unitData.get(cleanUnit);
             unitInfo.totalWeighted += weighted;
             unitInfo.totalCoef += coef;
 
@@ -224,7 +246,7 @@ function processFileData(data, outputDiv) {
 
         // Generate output HTML
         let html = '<h2><i class="fas fa-book"></i> Subject Results</h2>';
-        html += `<p style="color: #666; font-size: 0.9rem; margin-bottom: 15px;">Grade Scale: 0-20 | File detected: ${gradeScale === 2000 ? '0-2000 (converted)' : '0-20'}</p>`;
+        //html += `<p style="color: #666; font-size: 0.9rem; margin-bottom: 15px;">Grade Scale: 0-20 | File detected: ${gradeScale === 2000 ? '0-2000 (converted)' : '0-20'}</p>`;
         html += '<table>';
         html += '<tr><th>Subject</th><th>DEVOIR</th><th>TP</th><th>PROJET</th><th>EXAMEN</th><th>Coef.</th><th>Average</th><th>Weighted</th></tr>';
 
@@ -299,8 +321,8 @@ function processFileData(data, outputDiv) {
           <table>
             <tr><th>Total Weighted</th><th>Total Coefficient</th><th>Semester Average</th></tr>
             <tr>
-              <td>${data.totalWeighted.toFixed(2)}</td>
-              <td>${Math.round(data.totalCoef/100)}</td>
+              <td class="semester-total-weighted">${data.totalWeighted.toFixed(2)/100}</td>
+              <td class="semester-total-coef">${Math.round(data.totalCoef/100)}</td>
               <td class="unit-grade ${getGradeClass(semesterAvg)}">${semesterAvg.toFixed(2)}</td>
             </tr>
           </table>

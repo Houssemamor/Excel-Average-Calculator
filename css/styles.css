@@ -237,6 +237,12 @@ tr:hover {
     font-weight: bold;
 }
 
+.semester-total-weighted,
+.semester-total-coef {
+    font-weight: bold;
+    color: #1a2a6c;
+}
+
 /* Instructions Box */
 .instructions {
     background: #e9f7fe;
