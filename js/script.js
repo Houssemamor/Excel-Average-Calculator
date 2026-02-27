@@ -76,6 +76,46 @@ function extractSemester(unit) {
     return match ? `Semester ${match[1]}` : "Other";
 }
 
+// Auto-detect column indices from headers
+function detectColumnIndices(headerRow) {
+    const indices = {
+        unit: -1,
+        unitCoef: -1,
+        subject: -1,
+        coef: -1,
+        devoir: -1,
+        projet: -1,
+        exam: -1,
+        tp: -1
+    };
+
+    // Search headers for column names (case-insensitive)
+    for (let i = 0; i < headerRow.length; i++) {
+        const header = String(headerRow[i] || '').toLowerCase().trim();
+
+        if (header.includes('unité') && !header.includes('unité/')) indices.unit = i;
+        if (header.includes('coef') && header.includes('unité')) indices.unitCoef = i;
+        if (header.includes('unité/matière') || header.includes('subject') || (header.includes('matière') && !header.includes('coef'))) indices.subject = i;
+        if (header.includes('coef') && !header.includes('unité')) indices.coef = i;
+        if (header.includes('devoir')) indices.devoir = i;
+        if (header.includes('projet')) indices.projet = i;
+        if (header.includes('examen')) indices.exam = i;
+        if (header.includes('travaux') || header.includes('pratiques') || header === 'tp') indices.tp = i;
+    }
+
+    // Fallback to default indices if detection fails
+    if (indices.unit === -1) indices.unit = 0;
+    if (indices.subject === -1) indices.subject = 2;
+    if (indices.coef === -1) indices.coef = 3;
+    if (indices.devoir === -1) indices.devoir = 4;
+    if (indices.projet === -1) indices.projet = 5;
+    if (indices.exam === -1) indices.exam = 6;
+    if (indices.tp === -1) indices.tp = 7;
+
+    console.log('Detected column indices:', indices);
+    return indices;
+}
+
 // Process and handle Excel file
 function processExcelFile(file) {
     if (!file) return;
@@ -110,16 +150,19 @@ function processFileData(data, outputDiv) {
         const semesterData = new Map();
         const allGrades = []; // Collect all grades to detect scale
 
+        // Auto-detect column indices from header row
+        const colIndices = detectColumnIndices(sheet[1]);
+
         // First pass: collect all grades to detect scale
         for (let i = 2; i < sheet.length; i++) {
             const row = sheet[i];
-            if (!row || row.length < 10) continue;
+            if (!row || row.length < 4) continue;
 
             allGrades.push(
-                sanitizeNumber(row[4]), // DEVOIR
-                sanitizeNumber(row[5]), // PROJET
-                sanitizeNumber(row[6]), // EXAMEN
-                sanitizeNumber(row[7])  // TRAVAUX PRATIQUES
+                sanitizeNumber(row[colIndices.devoir]), // DEVOIR
+                sanitizeNumber(row[colIndices.projet]), // PROJET
+                sanitizeNumber(row[colIndices.exam]),   // EXAMEN
+                sanitizeNumber(row[colIndices.tp])      // TRAVAUX PRATIQUES
             );
         }
 
@@ -129,16 +172,16 @@ function processFileData(data, outputDiv) {
         // Second pass: process rows with normalized grades
         for (let i = 2; i < sheet.length; i++) {
             const row = sheet[i];
-            if (!row || row.length < 10) continue;
+            if (!row || row.length < 4) continue;
 
-            // Column mappings
-            const unit = row[0] || '-';          // Column A: Unit
-            const name = row[2] || '-';          // Column C: Subject name
-            const coef = sanitizeNumber(row[3]); // Column D: Coefficient
-            const devoir = normalizeGrade(sanitizeNumber(row[4]), gradeScale); // Column E: DEVOIR
-            const projet = normalizeGrade(sanitizeNumber(row[5]), gradeScale); // Column F: PROJET
-            const exam = normalizeGrade(sanitizeNumber(row[6]), gradeScale);   // Column G: EXAMEN
-            const tp = normalizeGrade(sanitizeNumber(row[7]), gradeScale);     // Column H: TRAVAUX PRATIQUES
+            // Column mappings using auto-detected indices
+            const unit = row[colIndices.unit] || '-';
+            const name = row[colIndices.subject] || '-';
+            const coef = sanitizeNumber(row[colIndices.coef]);
+            const devoir = normalizeGrade(sanitizeNumber(row[colIndices.devoir]), gradeScale);
+            const projet = normalizeGrade(sanitizeNumber(row[colIndices.projet]), gradeScale);
+            const exam = normalizeGrade(sanitizeNumber(row[colIndices.exam]), gradeScale);
+            const tp = normalizeGrade(sanitizeNumber(row[colIndices.tp]), gradeScale);
 
             // Skip rows with invalid coefficient or no grades at all
             if (isNaN(coef)) {
@@ -183,7 +226,7 @@ function processFileData(data, outputDiv) {
         let html = '<h2><i class="fas fa-book"></i> Subject Results</h2>';
         html += `<p style="color: #666; font-size: 0.9rem; margin-bottom: 15px;">Grade Scale: 0-20 | File detected: ${gradeScale === 2000 ? '0-2000 (converted)' : '0-20'}</p>`;
         html += '<table>';
-        html += '<tr><th>Subject</th><th>EXAMEN</th><th>DEVOIR</th><th>PROJET</th><th>TP</th><th>Coef.</th><th>Average</th><th>Weighted</th></tr>';
+        html += '<tr><th>Subject</th><th>DEVOIR</th><th>TP</th><th>PROJET</th><th>EXAMEN</th><th>Coef.</th><th>Average</th><th>Weighted</th></tr>';
 
         let totalWeighted = 0;
         let totalCoef = 0;
@@ -214,10 +257,10 @@ function processFileData(data, outputDiv) {
                 
                 html += `<tr class="${unitBgClass}">
           <td>${row.name}</td>
-          <td class="subject-grade ${getGradeClass(row.exam)}">${displayGrade(row.exam)}</td>
           <td class="subject-grade ${getGradeClass(row.devoir)}">${displayGrade(row.devoir)}</td>
-          <td class="subject-grade ${getGradeClass(row.projet)}">${displayGrade(row.projet)}</td>
           <td class="subject-grade ${getGradeClass(row.tp)}">${displayGrade(row.tp)}</td>
+          <td class="subject-grade ${getGradeClass(row.projet)}">${displayGrade(row.projet)}</td>
+          <td class="subject-grade ${getGradeClass(row.exam)}">${displayGrade(row.exam)}</td>
           <td>${Math.round(row.coef/100)}</td>
           <td class="subject-grade ${getGradeClass(row.avg)}">${avgDisplay}</td>
           <td>${row.weighted.toFixed(2)/100}</td>
