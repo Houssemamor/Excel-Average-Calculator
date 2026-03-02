@@ -28,6 +28,9 @@
 <body>
     <div class="container">
         <header>
+            <button id="dark-mode-toggle" class="dark-mode-btn" title="Toggle dark mode">
+                <i class="fas fa-moon"></i>
+            </button>
             <h1><i class="fas fa-calculator"></i> Excel Average Calculator</h1>
             <p>Calculate subject, unit, and semester averages from Excel files</p>
         </header>
@@ -112,6 +115,26 @@
         
         // Load commit info when page loads
         window.addEventListener('load', loadCommitInfo);
+
+        // Dark mode toggle with localStorage persistence
+        (function () {
+            const toggle = document.getElementById('dark-mode-toggle');
+            const icon = toggle.querySelector('i');
+            const STORAGE_KEY = 'darkMode';
+
+            // Apply saved preference on load
+            if (localStorage.getItem(STORAGE_KEY) === 'true') {
+                document.body.classList.add('dark-mode');
+                icon.classList.replace('fa-moon', 'fa-sun');
+            }
+
+            toggle.addEventListener('click', function () {
+                document.body.classList.toggle('dark-mode');
+                const isDark = document.body.classList.contains('dark-mode');
+                icon.classList.replace(isDark ? 'fa-moon' : 'fa-sun', isDark ? 'fa-sun' : 'fa-moon');
+                localStorage.setItem(STORAGE_KEY, isDark);
+            });
+        })();
     </script>
 </body>
 

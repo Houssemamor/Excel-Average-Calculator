@@ -33,6 +33,7 @@ header {
     margin-bottom: 30px;
     padding-bottom: 20px;
     border-bottom: 2px solid #e0e0e0;
+    position: relative;
 }
 
 h1 {
@@ -127,14 +128,14 @@ th {
     background: linear-gradient(to right, #1a2a6c, #3a4ca8);
     color: white;
     padding: 15px;
-    text-align: center;
+    text-align: left;
     font-weight: 600;
 }
 
 td {
     padding: 12px 15px;
     border-bottom: 1px solid #e0e0e0;
-    text-align: center;
+    text-align: left;
 }
 
 tr:nth-child(even) {
@@ -403,6 +404,15 @@ footer {
         margin: 15px 0 10px;
     }
 
+    /* Dark mode toggle */
+    .dark-mode-btn {
+        top: 12px;
+        right: 12px;
+        width: 36px;
+        height: 36px;
+        font-size: 1rem;
+    }
+
     /* Upload Container */
     .upload-container {
         padding: 20px;
@@ -639,4 +649,208 @@ footer {
     color: #dc3545;
     text-align: center;
     padding: 20px;
+}
+
+/* Dark Mode Toggle Button */
+.dark-mode-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: none;
+    border: 2px solid #1a2a6c;
+    color: #1a2a6c;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.dark-mode-btn:hover {
+    background-color: #1a2a6c;
+    color: white;
+}
+
+/* Dark Mode Overrides */
+body.dark-mode {
+    background: linear-gradient(135deg, #0d1117, #161b22, #0d1117);
+}
+
+body.dark-mode .container {
+    background: rgba(22, 27, 34, 0.97);
+    color: #c9d1d9;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+}
+
+body.dark-mode header {
+    border-bottom-color: #30363d;
+}
+
+body.dark-mode h1 {
+    color: #58a6ff;
+}
+
+body.dark-mode h2 {
+    color: #f85149;
+}
+
+body.dark-mode h3 {
+    color: #58a6ff;
+    border-bottom-color: #30363d;
+}
+
+body.dark-mode header p {
+    color: #8b949e;
+}
+
+/* Dark mode toggle button appearance */
+body.dark-mode .dark-mode-btn {
+    border-color: #58a6ff;
+    color: #58a6ff;
+}
+
+body.dark-mode .dark-mode-btn:hover {
+    background-color: #58a6ff;
+    color: #0d1117;
+}
+
+/* Upload container */
+body.dark-mode .upload-container {
+    background: #0d1117;
+    border-color: #30363d;
+}
+
+body.dark-mode .upload-container i {
+    color: #58a6ff;
+}
+
+body.dark-mode .upload-container p {
+    color: #8b949e;
+}
+
+body.dark-mode .upload-container.dragover {
+    background: #161b22;
+    border-color: #58a6ff;
+    box-shadow: 0 8px 20px rgba(88, 166, 255, 0.15);
+}
+
+body.dark-mode .upload-btn {
+    background: linear-gradient(to right, #238636, #1f6feb);
+}
+
+/* Instructions */
+body.dark-mode .instructions {
+    background: #161b22;
+    border-left-color: #58a6ff;
+    color: #c9d1d9;
+}
+
+body.dark-mode .instructions h4 {
+    color: #58a6ff;
+}
+
+body.dark-mode .instructions li {
+    color: #c9d1d9;
+}
+
+/* Tables */
+body.dark-mode table {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+body.dark-mode th {
+    background: linear-gradient(to right, #0d1117, #161b22);
+    color: #c9d1d9;
+}
+
+body.dark-mode td {
+    border-bottom-color: #30363d;
+    color: #c9d1d9;
+}
+
+body.dark-mode tr:nth-child(even) {
+    background-color: #161b22;
+}
+
+body.dark-mode tr:hover {
+    background-color: #1c2128;
+}
+
+/* Unit subheaders */
+body.dark-mode .unit-subheader {
+    border-top-color: #30363d;
+    border-bottom-color: #30363d;
+}
+
+body.dark-mode .unit-bg-light {
+    background-color: #0d1117;
+}
+
+body.dark-mode .unit-bg-dark {
+    background-color: #161b22;
+}
+
+body.dark-mode .unit-subheader.unit-bg-light {
+    background: linear-gradient(to right, #161b22, #0d1117);
+    color: #58a6ff;
+}
+
+body.dark-mode .unit-subheader.unit-bg-dark {
+    background: linear-gradient(to right, #1c2128, #161b22);
+    color: #58a6ff;
+}
+
+/* Semester card */
+body.dark-mode .semester-card {
+    background: linear-gradient(135deg, #161b22, #0d1117);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+}
+
+body.dark-mode .semester-total-weighted,
+body.dark-mode .semester-total-coef {
+    color: #58a6ff;
+}
+
+/* Overall average */
+body.dark-mode .overall-average {
+    background: linear-gradient(135deg, #8b0000, #5a0000);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+}
+
+/* Section notes */
+body.dark-mode .section-note {
+    background-color: #161b22;
+    border-left-color: #58a6ff;
+    color: #c9d1d9;
+}
+
+/* Uncertain badges */
+body.dark-mode .uncertain-badge {
+    background-color: #3d2e00;
+    color: #e3b341;
+    border-color: #e3b341;
+}
+
+body.dark-mode .uncertain-badge-inline {
+    background-color: #3d2e00;
+    color: #e3b341;
+    border-color: #e3b341;
+}
+
+/* Footer */
+body.dark-mode footer {
+    color: #8b949e;
+}
+
+body.dark-mode #commit-info a {
+    color: #58a6ff;
+}
+
+/* Error */
+body.dark-mode .error {
+    color: #f85149;
 }
