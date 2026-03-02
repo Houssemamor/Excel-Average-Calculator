@@ -1,168 +1,135 @@
 # Excel Average Calculator
 
-A web-based application to calculate subject, unit, and semester averages from Excel files.
+A client-side web application that parses Excel grade files and calculates weighted subject, unit, semester, and overall averages. No server required.
 
 ## Live Demo
 
-Try it now: [https://houssemamor.github.io/Excel-Average-Calculator/](https://houssemamor.github.io/Excel-Average-Calculator/)
+[https://houssemamor.github.io/Excel-Average-Calculator/](https://houssemamor.github.io/Excel-Average-Calculator/)
 
 ## Features
 
-- **Auto-detect columns** - Automatically identifies grade columns regardless of order
-- Upload Excel files with grade data
-- Automatic calculation of subject averages using weighted formula
-- Group subjects by unit and semester with visual separation
-- Display comprehensive statistics with color-coded grades
-- **Uncertain grade badges** - Marks subjects without exam grades
-- Responsive design optimized for desktop, tablet, and mobile
-- No server required - works entirely in the browser
-- Dynamic version tracking with last commit info
-- Support for 0-20 and 0-2000 grade scales
+- **Auto-detect columns** -- identifies grade columns by header name regardless of order
+- **Grade scale detection** -- supports both 0-20 and 0-2000 scales, normalizes automatically
+- **Weighted averages** -- Exam 60%, Coursework (Devoir/Projet/TP) 40%
+- **Uncertain grade badges** -- marks subjects missing an exam grade
+- **Unit and semester grouping** -- subjects organized by unit with semester extraction
+- **Color-coded grades** -- green (>=15), yellow (>=10), red (<10)
+- **Drag-and-drop upload** -- or click to browse
+- **Responsive design** -- optimized for desktop, tablet, and mobile
+- **Dynamic footer** -- shows last commit info via GitHub API
+- **Supports .xlsx and .xls** file formats
 
 ## Formula
 
-Subject averages are calculated using:
 ```
-Average = (Exam × 60%) + (Coursework × 40%)
+Subject Average = (Exam * 0.6) + (Coursework * 0.4)
 ```
 
-Where coursework includes Devoir, Projet, and TP components.
+If both Devoir and Projet exist, coursework is split equally (0.2 each). If the exam is missing, available components are averaged with equal weight and flagged as "Uncertain."
 
 ## Project Structure
 
 ```
 Excel-Average-Calculator/
-├── index.html              # Main HTML file
+├── index.html          # Entry point, footer with GitHub API commit fetch
 ├── css/
-│   └── styles.css         # Stylesheet
+│   └── styles.css      # All styling, responsive breakpoints at 768px and 480px
 ├── js/
-│   └── script.js          # JavaScript logic
-├── .gitignore             # Git ignore rules
-└── README.md              # This file
+│   └── script.js       # Excel parsing, grade calculation, HTML rendering
+├── .gitignore
+└── README.md
 ```
 
-## How to Use
+## Usage
 
-### Online (No Installation Required)
-Simply visit the live site: [https://houssemamor.github.io/Excel-Average-Calculator/](https://houssemamor.github.io/Excel-Average-Calculator/)
+### Online
+Visit the [live demo](https://houssemamor.github.io/Excel-Average-Calculator/).
 
-### Local Setup
-1. Clone or download this repository
-2. Open `index.html` in a web browser
-3. Upload your Excel file and view results
+### Local
+1. Clone the repository
+2. Open `index.html` in a browser
+3. Upload an Excel file
 
-### Usage Steps
-1. Click "Choose Excel File" or drag and drop your grades file
-2. The application will process and display:
-   - Subject results with individual grades
+### Steps
+1. Click "Choose Excel File" or drag and drop
+2. The app displays:
+   - Subject results with individual component grades
    - Unit averages grouped by unit
    - Semester averages
-   - Overall average
+   - Overall weighted average
 
 ## Excel File Format
 
-### Supported Columns (Order doesn't matter - auto-detected)
-- **Unité** / Unit: Unit/semester name (e.g., "Administration des systèmes/Semestre 1")
-- **Unité/Matière** / Subject: Subject/course name
-- **Coef** / Coefficient: Subject coefficient (weight)
-- **DEVOIR**: Devoir/Homework grade
-- **PROJET**: Project grade
-- **EXAMEN** / EXAM: Exam grade
-- **TRAVAUX PRATIQUES** / TP: Lab/practical work grade
+### Supported Columns (auto-detected, any order)
 
-### Important Notes
-- Headers should be in row 2
-- Data should start from row 3
-- The application automatically detects column positions, so any column order works
-- Supports both 0-20 and 0-2000 grade scales
-- Automatically converts 0-2000 scale to 0-20 for display
+| Column             | Description                          |
+|--------------------|--------------------------------------|
+| **Unité**          | Unit/semester name                   |
+| **Coef. unité**    | Unit coefficient (optional)          |
+| **Unité/Matière**  | Subject name                         |
+| **Coef.**          | Subject coefficient                  |
+| **DEVOIR**         | Homework grade                       |
+| **PROJET**         | Project grade                        |
+| **EXAMEN**         | Exam grade                           |
+| **TRAVAUX PRATIQUES** / **TP** | Lab/practical grade     |
 
-### Example Excel Structure
-```
-Row 1: [Notes] (title, optional)
-Row 2: [Unité] [Coef. unité] [Unité/Matière] [Coef.] [DEVOIR] [PROJET] [EXAMEN] [TP] ...
-Row 3: [Administration des systèmes/Semestre 1] [4,00] [Administration système Windows] [1,00] [] [15,00] [8,00] [] ...
-```
+### Layout Rules
+- Row 1: title (optional, ignored)
+- Row 2: headers (used for auto-detection)
+- Row 3+: data rows
+
+### Scale Handling
+If any grade value exceeds 20, the app treats the file as 0-2000 scale and divides all grades by 100 for display on a 0-20 scale.
 
 ## Deployment
 
-This project is already deployed on GitHub Pages at: [https://houssemamor.github.io/Excel-Average-Calculator/](https://houssemamor.github.io/Excel-Average-Calculator/)
+Hosted on GitHub Pages. Pushes to `main` deploy automatically.
 
-Changes pushed to the `main` branch are automatically deployed.
+## Technologies
 
-## Key Features Explained
-
-### Auto-Detect Column Detection
-The application intelligently identifies which columns contain grades, coefficients, and subject information. This means your Excel files can have columns in any order.
-
-### Uncertain Grades
-When a subject lacks an exam grade, the average is calculated from available components (Devoir, Projet, TP). These are marked with an "Uncertain" badge to indicate the grade might not be complete.
-
-### Grade Scale Detection
-Automatically detects whether grades are on a 0-20 or 0-2000 scale and converts accordingly for consistent display.
-
-### Unit and Semester Organization
-Subjects are grouped by unit with semester information extracted automatically. Unit names are cleaned up for better readability.
-
-### Mobile-Optimized
-- Responsive layouts for all screen sizes
-- Horizontal scrolling for data tables on small screens
-- Touch-friendly interface
-- Optimized performance on mobile devices
-
-## Technologies Used
-
-- HTML5
-- CSS3 with responsive design
-- Vanilla JavaScript
-- XLSX library for Excel parsing
-- Font Awesome icons
+- HTML5, CSS3, Vanilla JavaScript
+- [SheetJS (xlsx)](https://github.com/SheetJS/sheetjs) for Excel parsing
+- [Font Awesome 6](https://fontawesome.com/) for icons
 
 ## Browser Support
 
-- Chrome/Edge (latest)
+- Chrome / Edge (latest)
 - Firefox (latest)
 - Safari (latest)
 - Mobile browsers
 
-## License
-
-MIT License - Feel free to use this project for your needs.
-
-## Changelog
-
-### Latest Updates
-- Auto-detect column indices for flexible Excel formats
-- Support for subjects without exam grades (with "Uncertain" badges)
-- Improved mobile/tablet responsive design
-- Dynamic version tracking with commit messages
-- Cleaned unit naming (automatic semester extraction)
-- Support for 0-2000 grade scale detection and conversion
-
-## Footer Info
-
-The footer displays:
-- Last update date (linked to GitHub commit)
-- Current version (based on commit count)
-- Latest commit message
-- GitHub repository link
-
 ## Notes
 
-- All processing is done client-side - no data is sent to any server
-- Excel files are not stored - all calculations happen in memory
-- Column detection is case-insensitive and flexible
-- Empty grade cells are handled gracefully
-- Automatic rounding of coefficients for cleaner display
-- Console logs (F12 > Console) show detected columns and skipped rows for debugging
+- All processing is client-side. No data leaves the browser.
+- Column detection is case-insensitive with fallback defaults.
+- Empty grade cells are handled gracefully (shown as `-`).
+- Coefficients are rounded for display; raw values used in calculations.
+- Open the browser console (F12) to see detected columns and skipped rows.
 
 ## Changelog
 
-### Latest Updates
-- Auto-detect column indices for flexible Excel formats
-- Support for subjects without exam grades (with "Uncertain" badges)
-- Improved mobile/tablet responsive design
-- Dynamic version tracking with commit messages
-- Cleaned unit naming (automatic semester extraction)
-- Support for 0-2000 grade scale detection and conversion
-- Supports both .xlsx and .xls file formats
+### 2026-03-02
+- `732e4fa` Add section notes for uncertain grades; enhance UI with inline uncertain badges
+
+### 2026-02-27
+- `a13edd3` Enhance README with detailed Excel format instructions; clarify auto-detection and mobile responsiveness
+- `f3ecbcb` Fix column order in subject results table; move coefficient column to end
+- `8edae5a` Refactor footer layout and enhance responsive design across devices
+- `a285e00` Enhance semester data display with bold styling; improve unit name extraction
+- `c5f2fe6` Add footer with GitHub link and last commit info; implement auto-detection of column indices
+
+### 2026-02-26
+- `27d680a` Update meta tags for improved SEO and application description
+
+### 2026-02-25
+- `31dbd7f` Add unit subheader styling and uncertain grade badge; improve average calculation logic
+- `59f1210` Enhance usage instructions and clarify deployment process in README
+- `13d4839` Add live demo link to README
+- `40a541a` Round coefficients and total values for cleaner display; hide upload section after processing
+- `9f785b6` Fix grade column order in file processing for accurate calculations
+- `bc9b6f2` Implement grade scale detection and normalization (0-20 / 0-2000)
+- `d118380` Initial project: HTML, CSS, JavaScript, README, .gitignore
+
+## License
+
+MIT
