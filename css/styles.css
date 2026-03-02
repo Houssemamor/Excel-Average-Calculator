@@ -282,6 +282,33 @@ tr:hover {
     margin-right: 3px;
 }
 
+/* Uncertain badge inline for notes */
+.uncertain-badge-inline {
+    display: inline;
+    background-color: #fff3cd;
+    color: #856404;
+    padding: 2px 6px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: 1px solid #ffc107;
+}
+
+.uncertain-badge-inline i {
+    margin-right: 2px;
+}
+
+/* Section notes */
+.section-note {
+    background-color: #e7f3ff;
+    border-left: 4px solid #1a2a6c;
+    padding: 12px 15px;
+    margin: 15px 0 20px;
+    border-radius: 5px;
+    font-size: 0.95rem;
+    color: #333;
+}
+
 /* Footer */
 footer {
     text-align: center;
@@ -413,6 +440,13 @@ footer {
     .instructions li {
         font-size: 0.95rem;
         margin-bottom: 6px;
+    }
+
+    /* Section notes */
+    .section-note {
+        padding: 10px 12px;
+        font-size: 0.9rem;
+        margin: 12px 0 15px;
     }
 
     /* Tables - horizontal scroll on small screens */
@@ -563,6 +597,11 @@ footer {
 
     h2 {
         font-size: 1.2rem;
+    }
+
+    .section-note {
+        font-size: 0.85rem;
+        padding: 8px 10px;
     }
 
     th,

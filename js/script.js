@@ -297,8 +297,16 @@ function processFileData(data, outputDiv) {
 
         html += '</table>';
 
+        // Check if there are any uncertain grades
+        const hasUncertainGrades = result.some(row => !row.hasExamGrade);
+
+        // Show note only if uncertain grades exist
+        if (hasUncertainGrades) {
+            html += '<div class="section-note"><strong><i class="fas fa-info-circle"></i> Note:</strong> Grades marked as <span class="uncertain-badge-inline"><i class="fas fa-exclamation-circle"></i> Uncertain</span> are calculated from available components (Devoir, Projet, TP) without an exam grade. These averages may not represent the final grade.</div>';
+        }
+
         // Unit averages section
-        html += '<h2><i class="fas fa-layer-group"></i> Unit Averages</h2>';
+        html += '<h2><i class="fas fa-layer-group"></i> Unit Averages</h2>';        
         html += '<table><tr><th>Unit</th><th>Semester</th><th>Average</th><th>Total Coef</th></tr>';
 
         unitData.forEach((data, unit) => {
