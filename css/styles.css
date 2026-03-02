@@ -33,7 +33,6 @@ header {
     margin-bottom: 30px;
     padding-bottom: 20px;
     border-bottom: 2px solid #e0e0e0;
-    position: relative;
 }
 
 h1 {
@@ -404,10 +403,18 @@ footer {
         margin: 15px 0 10px;
     }
 
-    /* Dark mode toggle */
+    /* Dark mode toggle - smaller on mobile, stays fixed */
     .dark-mode-btn {
-        top: 12px;
-        right: 12px;
+        top: 15px;
+        right: 15px;
+        width: 36px;
+        height: 36px;
+        font-size: 1rem;
+    }
+
+    .github-btn {
+        top: 61px;
+        right: 15px;
         width: 36px;
         height: 36px;
         font-size: 1rem;
@@ -651,12 +658,13 @@ footer {
     padding: 20px;
 }
 
-/* Dark Mode Toggle Button */
+/* Dark Mode Toggle Button - fixed to viewport top-right */
 .dark-mode-btn {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    background: none;
+    position: fixed;
+    top: 30px;
+    right: 30px;
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.9);
     border: 2px solid #1a2a6c;
     color: #1a2a6c;
     width: 42px;
@@ -668,9 +676,37 @@ footer {
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .dark-mode-btn:hover {
+    background-color: #1a2a6c;
+    color: white;
+}
+
+/* GitHub Button - fixed below dark mode toggle, same style */
+.github-btn {
+    position: fixed;
+    top: 82px;
+    right: 30px;
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid #1a2a6c;
+    color: #1a2a6c;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    text-decoration: none;
+}
+
+.github-btn:hover {
     background-color: #1a2a6c;
     color: white;
 }
@@ -709,11 +745,23 @@ body.dark-mode header p {
 
 /* Dark mode toggle button appearance */
 body.dark-mode .dark-mode-btn {
+    background: rgba(13, 17, 23, 0.9);
     border-color: #58a6ff;
     color: #58a6ff;
 }
 
 body.dark-mode .dark-mode-btn:hover {
+    background-color: #58a6ff;
+    color: #0d1117;
+}
+
+body.dark-mode .github-btn {
+    background: rgba(13, 17, 23, 0.9);
+    border-color: #58a6ff;
+    color: #58a6ff;
+}
+
+body.dark-mode .github-btn:hover {
     background-color: #58a6ff;
     color: #0d1117;
 }
